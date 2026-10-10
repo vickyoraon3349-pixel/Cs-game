@@ -12,7 +12,7 @@ let last=performance.now();
 (function f(now){requestAnimationFrame(f);const dt=Math.min(.05,(now-last)/1000);last=now;
  if(!window.canMove){if(window.crouch)toggle();jy=0;vy=0}
  if(vy!==0||jy>0){vy-=22*dt;jy+=vy*dt;if(jy<=0){jy=0;vy=0}}
- P.position.y=jy;P.scale.y=window.crouch?.65:1;
- sc.children.forEach(g=>{const u=g.userData;if(u&&u.j!==undefined){g.position.y+=((u.j||0)-g.position.y)*.4;g.scale.y+=((u.c?.65:1)-g.scale.y)*.4}})
+ P.position.y=jy;P.scale.y=(window.crouch&&!window.glbOn)?.65:1;
+ sc.children.forEach(g=>{const u=g.userData;if(u&&u.j!==undefined){g.position.y+=((u.j||0)-g.position.y)*.4;g.scale.y+=(((u.c&&!window.glbOn)?.65:1)-g.scale.y)*.4}})
 })(performance.now());
 })();
