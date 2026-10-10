@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="hi"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Clash Squad</title>
+<style>
+html,body{margin:0;height:100%;overflow:hidden;background:#87b8e0;touch-action:none;user-select:none;-webkit-user-select:none;font-family:sans-serif}
+#gl{position:fixed;inset:0;width:100%;height:100%}
+#top{position:fixed;left:10px;top:10px;color:#fff;text-shadow:0 1px 3px #000;font-size:14px}
+#bird{position:fixed;right:10px;top:10px;padding:8px 10px;border:0;border-radius:8px;background:#000a;color:#fff;font-size:13px}
+#jl{position:fixed;left:22px;bottom:26px;width:120px;height:120px;border-radius:50%;background:#fff3;border:2px solid #fff8}
+#kn{position:absolute;left:40px;top:40px;width:40px;height:40px;border-radius:50%;background:#fffc}
+#look{position:fixed;right:0;top:60px;bottom:0;width:60%}
+</style></head><body>
+<canvas id="gl"></canvas>
+<div id="look"></div>
+<div id="jl"><div id="kn"></div></div>
+<div id="top">बाएँ: चलें · दाएँ: घुमाएँ</div>
+<button id="bird">🦅 ऊपर से देखें</button>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script src="map.js"></script>
+<script src="game.js"></script>
+<script src="combat.js"></script>
+<script src="/socket.io/socket.io.js"></script>
+<script src="net.js"></script>
+<script src="fx.js"></script>
+<script src="walls.js"></script>
+<script src="look.js"></script>
+<script src="moves.js"></script>
+<script src="nades.js"></script>
+</body></html>
