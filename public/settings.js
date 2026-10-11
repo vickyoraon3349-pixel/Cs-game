@@ -1,8 +1,8 @@
 (function(){
-const NAMES={fire:"🔥 गोली",jump:"🦘 कूदना",crouch:"🧎 झुकना",reload:"🔄 रीलोड",gloo:"🧊 Gloo Wall",nade:"💣 ग्रेनेड",bird:"🦅 ऊपर से देखें",mini:"मिनी-मैप",ammo:"गोलियों की गिनती",fullscr:"⛶ फुल-स्क्रीन",joy:"जॉयस्टिक"};
+const NAMES={run:"🏃 दौड़ना",fire:"🔥 गोली",jump:"🦘 कूदना",crouch:"🧎 झुकना",reload:"🔄 रीलोड",gloo:"🧊 Gloo Wall",nade:"💣 ग्रेनेड",bird:"🦅 ऊपर से देखें",mini:"मिनी-मैप",ammo:"गोलियों की गिनती",fullscr:"⛶ फुल-स्क्रीन",joy:"जॉयस्टिक"};
 const els={};
 document.querySelectorAll("button").forEach(b=>{const t=b.textContent.trim();
- const m=[["🔥","fire"],["🔄","reload"],["🧊","gloo"],["🦘","jump"],["🧎","crouch"],["💣","nade"],["⛶","fullscr"]].find(x=>t.startsWith(x[0]));
+ const m=[["🔥","fire"],["🔄","reload"],["🧊","gloo"],["🦘","jump"],["🧎","crouch"],["💣","nade"],["⛶","fullscr"],["🏃","run"]].find(x=>t.startsWith(x[0]));
  if(m)b.dataset.k=m[1];if(b.id==="bird")b.dataset.k="bird"});
 document.querySelectorAll("body > div").forEach(d=>{if(d.style.zIndex==="9")d.classList.add("ovl");if(d.style.bottom==="200px")d.dataset.k="ammo"});
 document.querySelectorAll("canvas").forEach(c=>{if(c.style.height==="158px")c.dataset.k="mini"});

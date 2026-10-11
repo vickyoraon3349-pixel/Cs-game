@@ -70,7 +70,7 @@ io.on("connection", sock => {
     sock.emit("joined", { id: sock.id, team, room: id });
     if (P.alive) sock.emit("spawn", { x: P.x, z: P.z, yaw: P.yaw });
   });
-  sock.on("start", () => { if (R && R.phase === "wait") startRound(R); });
+  sock.on("start", () => { if (R && R.phase === "wait") { addBots(R); startRound(R); } });
   sock.on("nade", d => {
     if (!P || !P.alive || R.phase !== "live" || P.nades <= 0 || Date.now() < P.nnext) return;
     const yaw = +(d && d.yaw) || 0, dx = -Math.sin(yaw), dz = -Math.cos(yaw);
@@ -192,3 +192,27 @@ setInterval(() => {
 
 const PORT = process.env.PORT || 3000;
 srv.listen(PORT, () => console.log("गेम चालू: http://localhost:" + PORT));
+function addBots(r) {
+  const teams = ["A", "A", "A", "B", "B", "B", "B"];
+  teams.forEach((team, i) => {
+    const used = list(r).filter(p => p.team === team).map(p => p.slot);
+    let slot = 0;
+    while (used.includes(slot) && slot < 4) slot++;
+    if (slot >= 4) return;
+
+    const id = "bot_" + r.id + "_" + i;
+    if (r.players.has(id)) return;
+
+    const p = {
+      id,
+      name: "AI Bot " + (i + 1),
+      team,
+      slot,
+      kills: 0,
+      bot: true
+    };
+    resetPlayer(p, null);
+    r.players.set(id, p);
+  });
+}
+

@@ -2,18 +2,17 @@
 const V="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/";
 const URL="https://cdn.jsdelivr.net/gh/mrdoob/three.js@r128/examples/models/gltf/Soldier.glb";
 const toast=document.createElement("div");
-toast.style.cssText="position:fixed;left:50%;bottom:8px;transform:translateX(-50%);background:#000c;color:#fff;font:13px sans-serif;padding:6px 12px;border-radius:8px;z-index:50;pointer-events:none;display:none;text-align:center";
+toast.style.cssText="position:fixed;left:50%;bottom:8px;transform:translateX(-50%);background:#000c;color:#fff;font:13px sans-serif;padding:6px 12px;border-radius:8px;z-index:50;pointer-events:none;display:none;text-align:center;max-width:90vw";
 document.body.appendChild(toast);
-function say(t){toast.textContent=t;toast.style.display="block";setTimeout(()=>toast.style.display="none",5000)}
+function say(t){toast.textContent=t;toast.style.display="block";setTimeout(()=>toast.style.display="none",6000)}
 function js(src){return new Promise((ok,no)=>{const s=document.createElement("script");s.src=src;s.onload=ok;s.onerror=()=>no(new Error(src));document.head.appendChild(s)})}
 const dk=new THREE.MeshLambertMaterial({color:0x15171a});
-let model=null,cn={};
+let model=null,cn={},cnames="",diag=false;
 js(V+"loaders/GLTFLoader.js").then(()=>js(V+"utils/SkeletonUtils.js")).then(()=>{
  new THREE.GLTFLoader().load(URL,gl=>{
-  model=gl.scene;
+  model=gl.scene;cnames=gl.animations.map(c=>c.name).join(",");
   gl.animations.forEach(c=>{const n=c.name.toLowerCase();if(/idle/.test(n))cn.Idle=c;else if(/walk/.test(n))cn.Walk=c;else if(/run/.test(n))cn.Run=c});
-  window.glbOn=true;
-  say("3D किरदार लोड ✓ ("+gl.animations.map(c=>c.name).join(", ")+")")},
+  window.glbOn=true;say("3D किरदार लोड ✓")},
   undefined,e=>{console.log(e);say("3D किरदार नहीं मिला, पुराना ही चलेगा")})
 }).catch(e=>{console.log(e);say("3D किरदार नहीं मिला, पुराना ही चलेगा")});
 
@@ -29,7 +28,6 @@ function aim(bone,child,dW){
  bone.quaternion.copy(qa.invert().multiply(qc));
  bone.updateMatrixWorld(true)}
 function setWQ(bone,q){bone.parent.getWorldQuaternion(qa);bone.quaternion.copy(qa.invert().multiply(q));bone.updateMatrixWorld(true)}
-// दो हड्डियों वाला हाथ/पैर टारगेट तक पहुँचाना
 function arm(U,F,H,T,pole){
  const S=U.getWorldPosition(V3(0,0,0)),E0=F.getWorldPosition(V3(0,0,0)),H0=H.getWorldPosition(V3(0,0,0));
  const L1=S.distanceTo(E0),L2=E0.distanceTo(H0);
@@ -45,7 +43,7 @@ function arm(U,F,H,T,pole){
  aim(F,H,S.clone().add(to).sub(E0).normalize())}
 
 function dress(g){
- const u=g.userData;u.gl=1;u.sp=0;u.cr=0;
+ const u=g.userData;u.gl=1;u.sp=0;u.cr=0;u.ph=0;
  g.children[0].visible=false;g.children[1].visible=false;
  if(!u.team)u.team=g.children[0].material.color;
  const m=THREE.SkeletonUtils.clone(model);
@@ -58,15 +56,25 @@ function dress(g){
  gun.add(box(.08,.12,.62,0,0,0));gun.add(box(.04,.04,.3,0,.02,.44));
  gun.add(box(.07,.2,.1,0,-.14,.06));gun.add(box(.07,.1,.2,0,-.02,-.38));gun.add(box(.05,.14,.1,0,-.12,.22));
  g.add(gun);u.gun=gun;
- m.updateMatrixWorld(true);
+ g.updateMatrixWorld(true);
  const b={chest:find(m,/Spine2$/),RU:find(m,/RightArm$/),RF:find(m,/RightForeArm$/),RH:find(m,/RightHand$/),LU:find(m,/LeftArm$/),LF:find(m,/LeftForeArm$/),LH:find(m,/LeftHand$/)};
  u.b=Object.values(b).every(x=>x)?b:null;
  const l={LUL:find(m,/LeftUpLeg$/),LLG:find(m,/LeftLeg$/),LFT:find(m,/LeftFoot$/),RUL:find(m,/RightUpLeg$/),RLG:find(m,/RightLeg$/),RFT:find(m,/RightFoot$/)};
  u.bl=Object.values(l).every(x=>x)?l:null;
  if(u.b){const r=m.worldToLocal(u.b.RU.getWorldPosition(V3(0,0,0))).sub(m.worldToLocal(u.b.LU.getWorldPosition(V3(0,0,0)))).normalize();
   const f=V3(0,1,0).cross(r);if(f.z<0)m.rotation.y=Math.PI}
+ g.updateMatrixWorld(true);
+ if(u.bl){
+  const S=l.LUL.getWorldPosition(V3(0,0,0)),K=l.LLG.getWorldPosition(V3(0,0,0)),A=l.LFT.getWorldPosition(V3(0,0,0));
+  u.leg=S.distanceTo(K)+K.distanceTo(A);
+  u.ank=Math.min(.2,Math.max(.04,A.y-g.position.y));
+  u.hw=l.LUL.getWorldPosition(V3(0,0,0)).distanceTo(l.RUL.getWorldPosition(V3(0,0,0)))/2;
+  const gi=g.getWorldQuaternion(new THREE.Quaternion()).invert();
+  u.fq=[l.LFT,l.RFT].map(bn=>gi.clone().multiply(bn.getWorldQuaternion(new THREE.Quaternion())));
+ }
  if(!u.b)gun.position.set(.2,1.1,.4);
- u.lx=g.position.x;u.lz=g.position.z}
+ u.lx=g.position.x;u.lz=g.position.z;
+ if(!diag){diag=true;say("3D ✓ | हाथ "+(u.b?"✓":"✗")+" पैर "+(u.bl?"✓":"✗")+" | क्लिप: "+cnames)}}
 
 let last=performance.now();
 (function f(now){requestAnimationFrame(f);const dt=Math.max(.001,Math.min(.1,(now-last)/1000));last=now;
@@ -79,7 +87,6 @@ let last=performance.now();
   const u=g.userData,sp=Math.hypot(g.position.x-u.lx,g.position.z-u.lz)/dt;
   u.lx=g.position.x;u.lz=g.position.z;
   if(u.rig)u.rig.visible=false;
-  // चाल के हिसाब से एनिमेशन और उसकी रफ़्तार
   u.sp+=(sp-u.sp)*Math.min(1,dt*12);
   const s=u.sp,tg=s<.8?"Idle":(s<3.8?"Walk":"Run");
   for(const k in u.w){u.w[k]+=((k===tg?1:0)-u.w[k])*Math.min(1,dt*10);if(u.act[k])u.act[k].setEffectiveWeight(u.w[k])}
@@ -88,20 +95,27 @@ let last=performance.now();
   u.mx.update(dt);
   u.mats.forEach(m=>m.color.setRGB(1,1,1).lerp(u.team,.5));
   g.updateMatrixWorld(true);
-  const gq=g.getWorldQuaternion(new THREE.Quaternion());
-  // असली झुकना: कमर नीची, पैर ज़मीन पर, घुटने मुड़ें
-  const want=(g===P?window.crouch:u.c)?1:0;
-  u.cr+=(want-u.cr)*Math.min(1,dt*10);
+  const gq=g.getWorldQuaternion(new THREE.Quaternion()),fw=V3(0,0,1).applyQuaternion(gq);
   const bl=u.bl;
-  if(bl&&u.cr>.02){
-   const fl=bl.LFT.getWorldPosition(V3(0,0,0)),fr=bl.RFT.getWorldPosition(V3(0,0,0));
-   const ql=bl.LFT.getWorldQuaternion(new THREE.Quaternion()),qr=bl.RFT.getWorldQuaternion(new THREE.Quaternion());
-   u.model.position.y=-.38*u.cr;g.updateMatrixWorld(true);
-   const fw=V3(0,0,1).applyQuaternion(gq);
-   arm(bl.LUL,bl.LLG,bl.LFT,fl,fw);arm(bl.RUL,bl.RLG,bl.RFT,fr,fw);
-   setWQ(bl.LFT,ql);setWQ(bl.RFT,qr)
-  }else u.model.position.y=0;
-  // दोनों हाथों में गन
+  if(bl){
+   // 1) कमर की ऊँचाई: पैर की लंबाई के हिसाब से (खड़े 96%, झुके 62%)
+   const want=(g===P?window.crouch:u.c)?1:0;
+   u.cr+=(want-u.cr)*Math.min(1,dt*10);
+   u.model.position.y=0;g.updateMatrixWorld(true);
+   const hy=(bl.LUL.getWorldPosition(V3(0,0,0)).y+bl.RUL.getWorldPosition(V3(0,0,0)).y)/2-g.position.y;
+   const tgt=u.ank+u.leg*(.965-.345*u.cr);
+   u.model.position.y=Math.max(-.7,Math.min(.2,tgt-hy));
+   g.updateMatrixWorld(true);
+   // 2) चाल: रफ़्तार से कदम की लंबाई, ऊँचाई और ताल तय होती है
+   const cyc=1.2+.8*Math.min(1,Math.max(0,(s-2.5)/2.5));
+   const A=Math.min(cyc/4,s*.2),Hh=Math.min(.22,s*.06);
+   if(s>.05)u.ph+=6.2832*s*dt/cyc;
+   [[bl.LUL,bl.LLG,bl.LFT,1,0,0],[bl.RUL,bl.RLG,bl.RFT,-1,Math.PI,1]].forEach(f2=>{
+    const th=u.ph+f2[4];
+    const T=g.localToWorld(V3(f2[3]*u.hw,u.ank+Hh*Math.max(0,Math.cos(th)),A*Math.sin(th)));
+    arm(f2[0],f2[1],f2[2],T,fw);
+    setWQ(f2[2],gq.clone().multiply(u.fq[f2[5]]))})
+  }
   if(u.b){
    const bb=u.b;
    const gp=bb.chest.getWorldPosition(V3(0,0,0)).add(V3(0,-.1,.24).applyQuaternion(gq));

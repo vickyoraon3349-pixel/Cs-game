@@ -6,6 +6,8 @@
 html,body{margin:0;height:100%;overflow:hidden;background:#87b8e0;touch-action:none;user-select:none;-webkit-user-select:none;font-family:sans-serif}
 #gl{position:fixed;inset:0;width:100%;height:100%}
 #top{position:fixed;left:10px;top:10px;color:#fff;text-shadow:0 1px 3px #000;font-size:14px}
+#run{position:fixed;right:18px;bottom:140px;padding:12px;border:0;border-radius:12px;background:#000a;color:white;font-size:16px;}
+#jump{position:fixed;right:22px;bottom:65px;padding:14px;border:0;border-radius:50%;background:#000a;color:white;font-size:16px;}
 #bird{position:fixed;right:10px;top:10px;padding:8px 10px;border:0;border-radius:8px;background:#000a;color:#fff;font-size:13px}
 #jl{position:fixed;left:22px;bottom:26px;width:120px;height:120px;border-radius:50%;background:#fff3;border:2px solid #fff8}
 #kn{position:absolute;left:40px;top:40px;width:40px;height:40px;border-radius:50%;background:#fffc}
@@ -15,6 +17,8 @@ html,body{margin:0;height:100%;overflow:hidden;background:#87b8e0;touch-action:n
 <div id="look"></div>
 <div id="jl"><div id="kn"></div></div>
 <div id="top">बाएँ: चलें · दाएँ: घुमाएँ</div>
+<button id="run">🏃 दौड़ें</button>
+<button id="jump">⬆️ कूदें</button>
 <button id="bird">🦅 ऊपर से देखें</button>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 <script src="map.js"></script>
